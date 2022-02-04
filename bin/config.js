@@ -2,7 +2,7 @@
  * @Author: 小方块 
  * @Date: 2022-02-04 13:13:56 
  * @Last Modified by: 小方块
- * @Last Modified time: 2022-02-04 13:14:38
+ * @Last Modified time: 2022-02-04 16:29:07
  * 命令行参数
  */
 const config = {
@@ -26,6 +26,12 @@ const config = {
     description: 'set your server host',
     usage: 'hardy-http-server --host 127.0.0.1',
     default: 'localhost'
+  },
+  gzip: {
+    option: '-g, --gzip <val>',
+    description: 'set gzip if you want',
+    usage: 'hardy-http-server --gzip true',
+    default: true
   }
 }
 

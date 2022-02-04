@@ -2,7 +2,7 @@
  * @Author: 小方块 
  * @Date: 2022-02-04 13:13:37 
  * @Last Modified by: 小方块
- * @Last Modified time: 2022-02-04 16:24:37
+ * @Last Modified time: 2022-02-04 16:31:49
  * desc: 服务类
  */
 
@@ -33,6 +33,7 @@ class Server {
     this.port = options.port
     this.directory = options.directory
     this.host = options.host
+    this.gzip = options.gzip
     this.template = template
   }
   start() {
@@ -71,7 +72,7 @@ class Server {
   _sendFile(req, res, filePath, statObject) {
     res.setHeader('content-type', mime.getType(filePath) + ';charset=utf-8')
     let gzip = this._gzip(req, res, filePath, statObject)
-    if (gzip) {
+    if (gzip && this.gzip) {
       res.setHeader('Content-Encoding', 'gzip')
       createReadStream(filePath).pipe(gzip).pipe(res)
     } else {
