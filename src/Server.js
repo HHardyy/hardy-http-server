@@ -2,7 +2,7 @@
  * @Author: 小方块 
  * @Date: 2022-02-04 13:13:37 
  * @Last Modified by: 小方块
- * @Last Modified time: 2022-02-04 16:03:47
+ * @Last Modified time: 2022-02-04 16:24:37
  * desc: 服务类
  */
 
@@ -70,7 +70,20 @@ class Server {
   }
   _sendFile(req, res, filePath, statObject) {
     res.setHeader('content-type', mime.getType(filePath) + ';charset=utf-8')
-    createReadStream(filePath).pipe(res)
+    let gzip = this._gzip(req, res, filePath, statObject)
+    if (gzip) {
+      res.setHeader('Content-Encoding', 'gzip')
+      createReadStream(filePath).pipe(gzip).pipe(res)
+    } else {
+      createReadStream(filePath).pipe(res)
+    }
+  }
+  _gzip(req, res, filePath, statObject) {
+    if (req.headers['accept-encoding'] && req.headers['accept-encoding'].includes('gzip')) {
+      return require('zlib').createGzip() // 创建一个转化流
+    } else {
+      return false
+    }
   }
   async _sendDirs(req, res, filePath, statObject, pathname) {
     try {
