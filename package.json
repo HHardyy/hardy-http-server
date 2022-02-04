@@ -1,0 +1,30 @@
+{
+  "name": "hardy-http-server",
+  "version": "1.0.0",
+  "description": "js 写的一个node服务",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/HHardyy/hardy-http-server.git"
+  },
+  "keywords": [
+    "hardy-http-server"
+  ],
+  "author": "hardy-小方块",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/HHardyy/hardy-http-server/issues"
+  },
+  "homepage": "https://github.com/HHardyy/hardy-http-server#readme",
+  "bin": {
+    "hardy-http-server": "./bin/www.js",
+    "hhs": "./bin/www.js"
+  },
+  "dependencies": {
+    "colors": "^1.4.0",
+    "commander": "^9.0.0",
+    "debug": "^4.3.3",
+    "ejs": "^3.1.6",
+    "mime": "^3.0.0"
+  }
+}
