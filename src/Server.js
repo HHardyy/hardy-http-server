@@ -2,7 +2,7 @@
  * @Author: 小方块 
  * @Date: 2022-02-04 13:13:37 
  * @Last Modified by: 小方块
- * @Last Modified time: 2022-02-04 16:31:49
+ * @Last Modified time: 2022-02-05 22:37:52
  * desc: 服务类
  */
 
@@ -15,6 +15,7 @@ const { createReadStream, createWriteStream, readFileSync } = require('fs')
 const path = require('path')
 const url = require('url')
 const util = require('util')
+const crypto = require('crypto')
 
 /**
  * dependencies
@@ -52,7 +53,7 @@ class Server {
       if (statObject.isFile()) {
         this._sendFile(req, res, filePath, statObject)
       } else {
-        let concatFilePath = path.join(filePath, 'index1.html')
+        let concatFilePath = path.join(filePath, 'index.html')
         try {
           const statObject = await fses.stat(concatFilePath)
           this._sendFile(req, res, concatFilePath, statObject)
@@ -69,7 +70,14 @@ class Server {
     res.statusCode = 404
     res.end('Not Found')
   }
-  _sendFile(req, res, filePath, statObject) {
+  async _sendFile(req, res, filePath, statObject) {
+    const _cache = await this._cache(req, res, filePath, statObject)
+
+    if (_cache) {
+      res.statusCode = 304
+      return res.end()
+    }
+
     res.setHeader('content-type', mime.getType(filePath) + ';charset=utf-8')
     let gzip = this._gzip(req, res, filePath, statObject)
     if (gzip && this.gzip) {
@@ -79,6 +87,27 @@ class Server {
       createReadStream(filePath).pipe(res)
     }
   }
+  // 服务端缓存 (浏览器协商)
+  async _cache(req, res, filePath, statObject) {
+    res.setHeader('Expires', new Date(Date.now() + 10 * 1000).toGMTString())
+    res.setHeader('Cache-Control', 'max-age=10')  // 10m
+
+    const _fileContent = await fses.readFile(filePath)
+
+    // 指纹
+    const ifNoneMatch = req.headers['if-none-match']
+    const etag = crypto.createHash('md5').update(_fileContent).digest('base64')
+
+    // 多出时间
+    const ifModifiedScince = req.headers['if-modified-since']
+    const ctime = statObject.ctime.toGMTString()
+
+    res.setHeader('Last-Modified', ctime)
+    res.setHeader('Etag', etag)
+
+    return (ifNoneMatch !== etag) || (ifModifiedScince !== ctime) ? false : true
+  }
+  // 压缩传输
   _gzip(req, res, filePath, statObject) {
     if (req.headers['accept-encoding'] && req.headers['accept-encoding'].includes('gzip')) {
       return require('zlib').createGzip() // 创建一个转化流
