@@ -1,7 +1,7 @@
 {
   "name": "hardy-http-server",
   "version": "1.0.4",
-  "description": "js 写的一个node服务",
+  "description": "a node server",
   "main": "index.js",
   "repository": {
     "type": "git",
